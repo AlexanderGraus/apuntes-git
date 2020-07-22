@@ -1,0 +1,21 @@
+1. Creando primer commit
+
+git init -> crear un nuevo repositorio
+git status -> da info sobre como se encuentra el repositorio
+git add [archivos] -> agregar archivos al stage
+git commit -m "texto del commit" -> agregar un commit
+
+2.Working directory
+
+git log -> muestra la lista de commits realizados
+	Hash que aparece arriba del commit, cada uno tiene un id unico
+
+git diff -> ver la lista de cambios que aun no estan en el stage
+git commit --ammend -> mete los nuevos cambios en el ultimo commit, por si te olvidaste de algo
+
+3. como deshago una modificacion
+
+git checkout --[nombre del archivo] -> deshace los cambios locales en ese archivo.
+git reset HEAD [nombre del archivo]-> volver al ultimo commit, borra los cambios en el stage
+
+4. Deshacer un commit
