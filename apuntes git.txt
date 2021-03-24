@@ -1,11 +1,51 @@
-1. Creando primer commit
+Apuntes Git
+
+Consideraciones previas:
+Estos apuntes los tome viendo los videos sobre Git subidos por Makigas a su canal de youtube → https://youtu.be/jSJ8xhKtfP4 
+Este texto busca unicamente resumir sus videos.
+Dicho esto debo decir que todos los méritos de este material son de su autor, mientras que sus falencias son propias, seguramente por haber malentendido sus videos.
+Un saludo y te invito a seguir mejorando esta guia, por que no, usando Git
+
+1.Qué es git?
+
+Git es un sistema de control de versiones. Es uno de los sistemas mas usados. 
+Un sistema de control de versiones es una herramienta para almacenar los distintos cambios realizados en nuestro proyecto. Cuando se trabaja en proyectos grandes, y mas si contribuye mucha gente, un sistema como este se hace imprescindible. 
+Con git podes:
+volver a versiones anteriores del proyecto
+trabajar en varias versiones a la vez
+evitar que los cambios de un colaborador pisen los aportes de otro
+
+2. Como instalarlo
+
+En Linux: (lo mas facil es usar el gestor de paquetes de cada distro)
+apt-get install git
+
+En Mac
+git → para saber si lo tenes instalado. En caso de no estarlo la terminal te va a indicar los pasos para hacerlo
+
+En Windows
+Descargarlo desde aqui https://git-scm.com/
+instalarlo como cualquier programa
+Al momento de usarlo NO ABRIR LA TERMINAL DEL NAVEGADOR sino usar el programa git bash (es una terminal unix)
+
+Tambien esta la opcion de github desktop, es un cliente grafico de git. Y dentro del programa se puede abrir una terminal.
+
+3. Creando primer commit
+
+Un commit es la forma de ingresar un cambio en nuestro proyecto, lo aconsejable es siempre hacer un único cambio por commit.
+es importante hacer commits descriptivos, poner que cambiaste y por que
+
+HEAD: El puntero que apunta al commit sobre el que estamos trabajando
+
 
 git init -> crear un nuevo repositorio
 git status -> da info sobre como se encuentra el repositorio
 git add [archivos] -> agregar archivos al stage
+git add . -> agrega todos los cambios al stage 
 git commit -m "texto del commit" -> agregar un commit
+git add . && git commit -m “mensaje del commit” → agrega al stage y hace commit en una sola linea.
 
-2.Working directory
+4.Working directory
 
 git log -> muestra la lista de commits realizados
 	Hash que aparece arriba del commit, cada uno tiene un id unico
@@ -13,9 +53,222 @@ git log -> muestra la lista de commits realizados
 git diff -> ver la lista de cambios que aun no estan en el stage
 git commit --ammend -> mete los nuevos cambios en el ultimo commit, por si te olvidaste de algo
 
-3. como deshago una modificacion
+5. como deshago una modificacion
 
 git checkout --[nombre del archivo] -> deshace los cambios locales en ese archivo.
 git reset HEAD [nombre del archivo]-> volver al ultimo commit, borra los cambios en el stage
 
-4. Deshacer un commit
+6. Deshacer un commit
+Anotar cual es el commit al que queremos volver
+
+*git log --oneline -> te muestra el historial de commits en linea
+(apretar q en caso de no poder salir)
+
+*git reset [commit al que se quiere volver] -> elimina todos los  commit de mas arriba
+Es un comando destructivo. Esta bien para trabajar de forma local pero si trabajamos con otra gente, va a ser problematico cuando se sincronicen los repositorios, porque unos van a tener mas commits que otros. Es preferible usar el comando revert.
+*git reset --hard [commit al que se quiere volver] -> elimina los commits y ademas borra los cambios en tu directorio de trabajo (se borran los archivos de tu compu)
+*git reset --soft [commit al que se quiere volver] -> elimina los commit pero mantiene los cambios en el stage. 
+
+7. Revertir un commit
+
+*git diff [1 commit] [2 commit] -> Con diff tambien podemos ver la diferencia entre dos commits
+Lo que hace revert en este caso seria agregar las lineas que se sacaron y sacar las que se agregaron (el proceso inverso de un commit al otro)
+*git log --oneline --decorate -> muestra ademas la rama en la que estas y el puntero HEAD 
+*git diff HEAD~1 HEAD->muestra las diferencias entre el commit al que apunta HEAD y uno anterior
+*git revert [commit que queremos deshacer] -> crea un nuevo commit que deshace los cambios
+*git revert --no-commit [commit] -> deshace los cambios pero sin crear un nuevo commit, mantiene los archivos en el stage. Ideal para cuando se quiera eliminar mas de un commit
+Una vez deshago todos los commit que quiera ejecuto:
+*git revert --continue -> crea un commit desahaciendo todos los cambios anteriores
+
+8. Las Ramas
+
+la posibilidad de ramificar el trabajo permite establecer una nueva linea de trabajo sin perjudicar los cambios ya realizados. La idea es que una vez terminado se pueda volver a fusionar. Ademas permite realizar varios cambios a la vez, es un sistema necesario para proyectos donde trabaja mucha gente. 
+
+9. Crear modificar y eliminar ramas
+
+git branch -> muestra la lista de ramas creadas. el asterico marca la rama en la que estamos
+
+Existe una forma de trabajo en la cual cuando queramos agreagar una característica creamos una rama “feature [nombre de la caracteristica] De esa manera master queda siempre como codigo limpio
+git branch [nombre rama] -> crea una nueva rama
+git checkout [nombre de la rama a la que quiero ir] -> cambiamos de rama
+git checkout -b [nombre rama] -> crea la rama y se posiciona en ella
+git branch -m [nombre rama] [nuevo nombre de la rama] -> modifica el nombre de la rama
+git branch -d [nombre rama] -> elimina la rama
+git branch -h -> muestra un listado de todos los subcomandos disponibles
+
+10. Creacion de commits bajo las distintas ramas
+
+Los commits se crean de la misma manera que en la rama master, pero si cambio de rama todos los archivos de mi directorio de trabajo se van a modificar de acuerdo el HEAD de la nueva rama
+
+11. Unir las ramas
+
+La idea de crear una nueva rama es que una vez terminada la modificacion poder volver a unirla a master
+Tenemos la rama origen con los cambios y la rama origen, la idea es que el commit de la rama vuelva a master, para eso se usa la fusion (merge)
+Con la fusion se unen los cambios (commits) de ambas ramas.
+ir a la rama de destino:
+ git merge [nombre de la rama] -> unir las ramas
+
+git va a mostrar un mensaje con la tecnica usada para la fusion:
+fast forward: estrategia mas sencilla, cuando una rama tiene modificaciones y otra no, simplemente toma el puntero de la rama destino y lo mueve al ultimo commit de la rama origen
+recursiva: cuando tenemos cambios en ambas ramas, se crea un tercer commit en el que se integran. Si lo puede hacer automaticamente, lo hace, sino (por ejemplo cuando ambas ramas modificaron la misma linea) hay que resolver manualmente el conflicto.
+
+12. Resolver los conflictos
+
+Si hay dos cambios en el mismo archivo pero estos son en lineas difrentes no pasa nada. Git revisa linea a linea y mantiene los cambios.
+El problema sucede cuando hay dos cambios en la misma linea:
+Sale un mansaje avisando del conflicto y en archivo te deja las dos opciones de los cambios, para que decidamos por uno (o una mezcla de ambos) Para terminar guardamos en el stage  y creamos el commit.
+
+13. Construir alias
+
+Esta entrada quiza esta algo descolgada aca pero viene bien. 
+A veces esta bueno crear un alias, que es un nombre personalizado, como si fuera un atajo para acceder a comandos muy largos.
+
+Por ejemplo
+usar el alias git lod para el comando -> git log --oneline --decorate
+git config -> comando que se usa para editar la configuracion, tanto de este repositorio como del cliente de git instalado en la pc
+git config --global alias.[nombre del alias que queremos crear] '[comando]'
+--global es para que se aplique a todo nuestro cliente git
+En la documentacion se recomienda crear el alias unstage
+git config --global alias.unstage 'reset HEAD'
+git config --global--get-regexp alias → va a obtener todos los ajustes que tengan un alias
+git config --global --unset alias.[nombre del alias] → para borrar un alias
+
+
+14. Mas sobre conflictos
+
+Los conflictos en git son cosas comunes. No es algo complicado de solucionar. Para solucionarlo hay que pensar en que solución es la mas inteligente para el proyecto. De todas maneras no deberían haber dos personas pisando el mismo codigo.
+La mayoría de los conflictos no suceden en el  codigo,sino por ejemplo en los imports, puede pasar que un import este puesto en la misma posicion que otro
+Lo importante es dialogar y llegar a una solución común.
+en el editor el inicio de la zona conflictiva arranca con <<<<<<<
+lo que divide los conflictos es ======= 
+y el final de la segunda zona conflictiva termina con >>>>>>
+git merge --abort → aborta la fusion y vuelve la pantalla inicial (en casos donde imaginas que resolver tus conflictos te llevara mucho tiempo)
+Segun el autor los conflictos en git son inevitables. 
+Una ventaja de git es que los conflictos solo suceden en tu pc, el resto puede seguir trabajado.
+
+15. Como usar los tags
+
+Las etiquetas sirven para identificar un commit en particular, un commit especial por ejemplo el de la version 1.0.0. O quiza uno que tiene un cambio que hay que revisar.
+git tag [nombre del tag] → crear un tag en el ultimo commit del repositorio
+git tag [nombre del tag] [hash del commit]
+Estos son tags ligeros, pero en git los tags son objetos, pueden tener una descripcion, un autor, incluso una firma.
+git tag → lista de los tags
+git tag -d → borrar
+git tag -h → para ver todos sus subcomandos
+
+16. Tags anotados
+
+Existen dos tipos de tags,los ligeros y los anotados( los anteriores son los ligeros) 
+dentro de la carpeta .git esta /refs. que son las referencias que apuntan a commits (las ramas, el HEAD y los tags apuntan a commits)
+/refs/heads → son las ramas. cada uno de sus archivos tiene un codigo que apunta a un commit.
+las tags ligeras son lo mismo, estas apuntan siempre al mismo commit.
+En las etiquetas anotadas no solo tenes este puntero sino que brindan mas informacion. Son especialmente utiles para las nuevas versiones.
+git tag -l → podes listar y filtrar tags Ej:
+git tag -l “v0.1.*” → va a listar todos los tag que empiecen con v0.1
+Crear un tag anotado:
+git tag -a [nombre del tag] → te abre una pantalla para escribir un mensaje (cambios que agrega, bugs que arregla)
+git show [tag] → podes ver la info del tag
+git show [commit] → muestra info del commit
+
+17. Stash: esconder cambios
+
+Como puedo guardar los cambios de lo que estoy trabajando pero sin hacer un commit?
+Ejemplo: estoy haciendo un cambio, lo agrego al stage y en ese momento surge una emergencia que me obliga a cambiar de rama. Como hago para no perder los cambios?
+git stash → guarda tu directorio de trabajo. 
+git stash list → ver todas las cosas del stash. El mensaje del stash es el nombre de la rama en la que estabas trabajando y su commit
+git stash -apply → aplica los cambios del stash en tu directorio de trabajo. 
+Podes guardar varios stash , se guardan en “pila” y en la medida que vas dando apply se pasan de arriba hacia abajo.
+git stash drop → borra el stash
+git stash save “descripcion del stash” → agrega una descripcion
+git stash pop → apply + drop (aplica al directorio de trabajo y borra el stash)
+Podemos crear ramas de stash:
+git stash branch [nombre rama] [nombre del stash]
+(si no le indico el stash, aplica al último)
+Es importante siempre ponerle un mensaje al stash porque sino es imposible acordarse que tiene
+
+18. Introducción a remotos
+
+Sincronizar mi repositorio con otros en internet. 
+
+git → sistema de control de versiones distribuido. 
+Sin nociones del tipo  Cliente-Servidor. En git tenemos nodos independientes. La idea es que todos puedan interactuar entre si. (pull - push)
+remoto: conectar una pc con la que queremos interactuar
+pull: recibir de ese remoto
+push: enviar al remoto
+Repositorio sagrado: es un nodo clave del que dependen los demas (se usan en grandes redes) pero en teoria todos los nodos estan al mismo nivel.
+El repositorio en github podria ser un repo sagado. Todos se conectan a el, sin embargo uno puede conectar con otros sin el
+El remoto puede estar en la misma red o incluso en la misma pc
+
+19. Como hacer push
+
+Tomemos el ejemplo de un repositorio en gitlab
+creamos un repo nuevo en la pagina (podemos ponerlo publico o privado)
+Tendremos la direccion a la que nos podemos conectar. (con ssh podemos conectar con otras pc) Por https podemos clonar un repo en la web
+*git remote add [nombre del remoto] (cuando tenemos solo uno se le pone origin) [direccion del servidor]
+repositorio agregado
+
+git remote → lista los repositorios
+git remote -v → muestra mas info del repo
+
+para enviar nuestro codigo
+git push [nombre del remoto] [rama que quiero subir]
+git push[nombre repo] --al → sube todas las ramas
+si es privado te va a pedir usuario y contraseña
+se sube el repo y todos sus commits, ahora cualquiera con acceso puede clonarlo
+
+20. Clonar y hacer pull
+
+git clone [ubicacion del repo] → te clona el repositorio, te descarga todos los objetos que hay en el. podes ver los commits, hacer checkout, etc
+Cuando clonamos un repo se nos asocia con un remoto (ej origin)
+
+Para pedirle que nos descargue los nuevos commits:
+git pull [remoto] [rama]
+
+Si examinamos las ramas con
+git branch --all → vemos que aparecieron nuevas ramas remotes/[nombre remoto]/[nombre rama remota]
+
+21. Fetch y pull rebase
+
+Pull en realidad es la combinacion de dos comandos: Fetch y merge
+Fetch → pregunta a un remoto si tiene novedades. Las descarga en origin/[nombre rama que se modifico] 
+( las ramas se pueden crear en formatos carptetas, por ejemplo feature/fecha)
+
+Una vez descargadas esta rama (origin/rama) se fusiona con la rama desde la que hice el pull
+Qué ocurre cuando dos personas hacen un push a la vez?
+Hasta ahora todos los pull se resolvian con la estrategia fast forward, pero si hay modifiacaciones en ambas ramas va a tener que usar la estrategia recursiva
+
+Esto se puede solucionar con rebase
+git pull --rebase [remoto] [rama]
+	lo que hace rebase cuando intenta fusionar dos ramas que tienen commits en distintos tiempos. Es como que reorganiza los commits de forma que no se rompa el historial. 
+
+22. Como hacer un rebase?
+
+Podemos hacer lo que vimos en el capitulo anterior pero de forma local.  
+Cuidado con rebase porque reescribe el historial, si otros compañeros de trabajo ya hicieron  push antes va a ser un problema a la hora de sincronizar los commits
+Siempre hacerlo con cosas que no hayan sido pusheadas
+Escribir en la rama de origen:
+git rebase [rama destino]
+
+merge vs rebase
+
+merge te permite la  trazabilidad → podes ver de donde salen y a donde va cada rama
+en sentido contrario rebase se usa muchas veces para “achatar” y limpiar el historial, por esta misma razon, borra la informacion de las ramas
+
+23. Rebase interactivo
+
+Mas personalizacion para el rebase.
+Norma: si cambiamos el historial, estamos cambiando los hash, al cambiar el hash cambiamos el log. NO HACERLO SOBRE CODIGO YA PUSHEADO, se trabaja siempre en local. 
+
+funciones de rebase:
+git rebase -i HEAD~4 → para unir los ultimos 4 commits
+te va a llevar a una pantalla con distintos comandos
+pick: dejar el commit como esta
+reword: cambiar el mensaje 
+edit: modificar commit
+squash: aplastar commit
+fixup: eliminar el mensaje del log
+
+Aplastar commits:
+Poner squash delante de los commits a unir, el que este arriba de esos y empiece con pick es el commit en el que se van a incrustar los otros
+
+Al cambiar el orden de los commits en realidad lo que estamos cambiando es el orden de los punteros, pero las fechas no cambian
